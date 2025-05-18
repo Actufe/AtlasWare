@@ -11,7 +11,7 @@ local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManag
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
 local window = library:CreateWindow({
-    Title = 'Made By @kylosilly',
+    Title = 'Atlas Ware | Made By @dayumduh Tradelands',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -212,92 +212,45 @@ teleport_group:AddButton({
     Tooltip = 'Teleports you to selected tree'
 })
 
-local tween_speed = 30
-local local_player = game.Players.LocalPlayer
-local tween_service = game:GetService("TweenService")
-local run_service = game:GetService("RunService")
-
--- En yakın trunk'ı bulur
-local function getClosestTrunk()
-    local character = local_player.Character or local_player.CharacterAdded:Wait()
-    local rootPart = character:WaitForChild("HumanoidRootPart")
-    local closestTrunk = nil
-    local shortestDistance = math.huge
-
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj.Name == "Trunk" and obj:IsA("BasePart") and obj.Transparency == 0 and obj.Parent then
-            local trunkPos = Vector3.new(obj.Position.X, 0, obj.Position.Z)
-            local rootPos = Vector3.new(rootPart.Position.X, 0, rootPart.Position.Z)
-            local distance = (rootPos - trunkPos).Magnitude
-            if distance < shortestDistance then
-                shortestDistance = distance
-                closestTrunk = obj
-            end
-        end
-    end
-
-    return closestTrunk
-end
-
--- Tween ile trunk'a git
-local function tweenToTrunk(trunk)
-    local character = local_player.Character
-    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-    if not (rootPart and trunk) then return end
-
-    local direction = (trunk.Position - rootPart.Position).Unit
-    local targetPosition = trunk.Position - direction * 5
-    targetPosition = Vector3.new(targetPosition.X, trunk.Position.Y, targetPosition.Z)
-
-    local distance = (rootPart.Position - targetPosition).Magnitude
-    local tweenInfo = TweenInfo.new(distance / tween_speed, Enum.EasingStyle.Linear)
-    local goal = {CFrame = CFrame.new(targetPosition, trunk.Position)}
-
-    local tween = tween_service:Create(rootPart, tweenInfo, goal)
-    tween:Play()
-    tween.Completed:Wait()
-end
-
--- Toggle
 teleport_group:AddToggle('auto_goto_tree', {
     Text = 'Auto Goto Tree',
-    Default = false,
-    Tooltip = 'Automatically goes to the closest tree',
+    Default = goto_nearest_tree,
+    Tooltip = 'Automatically goes to closest tree',
 
     Callback = function(Value)
         goto_nearest_tree = Value
         if Value then
-            task.spawn(function()
-                while goto_nearest_tree do
-                    local trunk = getClosestTrunk()
-                    if trunk then
-                        -- Karakter hızını sıfırlamak için bağlantı
+            if selected_tree == "" then
+                library:Notify("Select Tree Before Teleporting")
+                goto_nearest_tree = false
+                return
+            end
+
+            repeat
+                if local_player.Character and local_player.Character:FindFirstChild("HumanoidRootPart") then
+                    local tree = closest_tree()
+                    if tree then
                         local velocity_connection = run_service.Heartbeat:Connect(function()
                             if local_player.Character and local_player.Character:FindFirstChild("HumanoidRootPart") then
                                 local_player.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
                                 local_player.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
                             end
                         end)
-
-                        tweenToTrunk(trunk)
-
-                        -- Trunk kırılana (transparan olana) kadar bekle
-                        while trunk and trunk.Parent and trunk.Transparency < 1 and goto_nearest_tree do
-                            task.wait(0.3)
-                        end
-
+                        local to = tree:GetPivot().Position
+                        local distance = (to - local_player.Character:GetPivot().Position).Magnitude
+                        local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / tween_speed, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = CFrame.new(tree:GetPivot().Position) + Vector3.new(0, -10, 3)})
+                        tween:Play()
+                        tween.Completed:Wait()
                         if velocity_connection then
                             velocity_connection:Disconnect()
                         end
-                    else
-                        task.wait(1) -- Ağaç bulunamadıysa biraz bekle
                     end
                 end
-            end)
+                task.wait()
+            until not goto_nearest_tree
         end
     end
 })
-
 
 teleport_group:AddDivider()
 
@@ -360,31 +313,59 @@ teleport_group:AddToggle('auto_goto_ore', {
                 return
             end
 
-            repeat
-                if local_player.Character and local_player.Character:FindFirstChild("HumanoidRootPart") then
-                    local ore = closest_ore()
-                    if ore then
-                        local velocity_connection = run_service.Heartbeat:Connect(function()
-                            if local_player.Character and local_player.Character:FindFirstChild("HumanoidRootPart") then
-                                local_player.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
-                                local_player.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+            task.spawn(function()
+                local Players = game:GetService("Players")
+                local TweenService = game:GetService("TweenService")
+                local LocalPlayer = Players.LocalPlayer
+
+                local function getClosestOreNode()
+                    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                    local root = character:WaitForChild("HumanoidRootPart")
+
+                    local closestNode
+                    local shortestDistance = math.huge
+
+                    for _, folder in pairs(workspace:WaitForChild("OreNodes"):GetChildren()) do
+                        for _, ore in pairs(folder:GetChildren()) do
+                            if ore:IsA("BasePart") and ore.Transparency == 0 then
+                                local dist = (root.Position - ore.Position).Magnitude
+                                if dist < shortestDistance then
+                                    shortestDistance = dist
+                                    closestNode = ore
+                                end
                             end
-                        end)
-                        local to = ore:GetPivot().Position
-                        local distance = (to - local_player.Character:GetPivot().Position).Magnitude
-                        local tween = tween_service:Create(local_player.Character.HumanoidRootPart, TweenInfo.new(distance / tween_speed, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = CFrame.new(ore:GetPivot().Position) + Vector3.new(0, 0, 2.5)})
-                        tween:Play()
-                        tween.Completed:Wait()
-                        if velocity_connection then
-                            velocity_connection:Disconnect()
                         end
                     end
+                    return closestNode
                 end
-                task.wait()
-            until not goto_nearest_ore
+
+                local function tweenTo(target)
+                    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                    local root = character:WaitForChild("HumanoidRootPart")
+
+                    local offsetDirection = (root.Position - target.Position).Unit
+                    local offset = offsetDirection * 5
+                    local goalPosition = target.Position + offset
+
+                    local lookAtCFrame = CFrame.new(goalPosition, target.Position)
+                    local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Linear)
+                    local tween = TweenService:Create(root, tweenInfo, {CFrame = lookAtCFrame})
+                    tween:Play()
+                    tween.Completed:Wait()
+                end
+
+                while goto_nearest_ore do
+                    local ore = getClosestOreNode()
+                    if ore then
+                        tweenTo(ore)
+                    end
+                    task.wait(0.5)
+                end
+            end)
         end
     end
 })
+
 
 teleport_group:AddDivider()
 
@@ -414,7 +395,7 @@ local watermark_connection = run_service.RenderStepped:Connect(function()
         FrameCounter = 0;
     end;
 
-    library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
+    library:SetWatermark(('Atlas Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
         math.floor(FPS),
         math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
     ));
@@ -438,8 +419,8 @@ theme_manager:SetLibrary(library)
 save_manager:SetLibrary(library)
 save_manager:IgnoreThemeSettings()
 save_manager:SetIgnoreIndexes({ 'MenuKeybind' })
-theme_manager:SetFolder('Astolfo Ware')
-save_manager:SetFolder('Astolfo Ware/Tradelands')
+theme_manager:SetFolder('Atlas Ware')
+save_manager:SetFolder('Atlas Ware/Tradelands')
 save_manager:BuildConfigSection(tabs['ui settings'])
 theme_manager:ApplyToTab(tabs['ui settings'])
 save_manager:LoadAutoloadConfig()
