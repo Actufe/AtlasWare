@@ -1,6 +1,6 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
 
-local games = "https://github.com/Actufe/AtlasWare/tree/main/Games"
+local games = "raw.https://github.com/Actufe/AtlasWare/tree/main/Games"
 
 local local_player = cloneref(game:GetService("Players").LocalPlayer)
 local market = cloneref(game:GetService("MarketplaceService"))
@@ -23,7 +23,7 @@ else
 end
 
 if game.GameId == 7546582051 and not game.PlaceId == 94845773826960 then
-    loadstring(game:HttpGet("https://github.com/Actufe/AtlasWare/blob/main/Games/Tradelands.lua",true))()
+    loadstring(game:HttpGet("https://raw.github.com/Actufe/AtlasWare/blob/main/Games/Tradelands.lua",true))()
     library:Notify("Supported Game Loading: "..info.Name)
     return
 end
