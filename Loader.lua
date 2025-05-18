@@ -1,6 +1,6 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
 
-local games = "raw.https://github.com/Actufe/AtlasWare/tree/main/Games"
+local games = "local games = "https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games"
 
 local local_player = cloneref(game:GetService("Players").LocalPlayer)
 local market = cloneref(game:GetService("MarketplaceService"))
