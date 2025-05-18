@@ -6,7 +6,7 @@ local local_player = cloneref(game:GetService("Players").LocalPlayer)
 local market = cloneref(game:GetService("MarketplaceService"))
 local info = market:GetProductInfo(game.PlaceId)
 
-function check_supported()
+if check_supported() then ... end
     local success, result = pcall(function()
         return game:HttpGet(games.."/"..game.PlaceId..".lua")
     end)
@@ -23,7 +23,7 @@ else
 end
 
 if game.GameId == 7546582051 and not game.PlaceId == 94845773826960 then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games/dungeon%20heroes.lua",true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games/dungeonheroes.lua",true))()
     library:Notify("Supported Game Loading: "..info.Name)
     return
 end
