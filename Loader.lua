@@ -1,6 +1,6 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
 
-local games = "https://raw.githubusercontent.com/kylosilly/Astolfo-Ware-V2/main/Games"
+local games = "https://github.com/Actufe/AtlasWare/tree/main/Games"
 
 local local_player = cloneref(game:GetService("Players").LocalPlayer)
 local market = cloneref(game:GetService("MarketplaceService"))
@@ -12,7 +12,7 @@ function check_supported()
     end)
     if not success or result == "404: Not Found" then
         library:Notify("Unsupported Game: "..info.Name.." If You Want It Supported Join The Discord Copied To Your Clipboard")
-        setclipboard("https://discord.gg/SUTpER4dNc")
+        setclipboard("https://discord.gg/vqKfva9e")
     end
 end
 
