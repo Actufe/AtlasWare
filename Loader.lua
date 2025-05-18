@@ -23,7 +23,7 @@ else
 end
 
 if game.GameId == 7546582051 and not game.PlaceId == 94845773826960 then
-    loadstring(game:HttpGet("https://raw.github.com/Actufe/AtlasWare/blob/main/Games/Tradelands.lua",true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games/dungeon%20heroes.lua",true))()
     library:Notify("Supported Game Loading: "..info.Name)
     return
 end
