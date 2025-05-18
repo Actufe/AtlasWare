@@ -1,34 +1,40 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
 
-local games = "local games = "https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games"
+local games = "https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games"
 
 local local_player = cloneref(game:GetService("Players").LocalPlayer)
 local market = cloneref(game:GetService("MarketplaceService"))
 local info = market:GetProductInfo(game.PlaceId)
 
-if check_supported() then ... end
-    local success, result = pcall(function()
-        return game:HttpGet(games.."/"..game.PlaceId..".lua")
-    end)
-    if not success or result == "404: Not Found" then
-        library:Notify("Unsupported Game: "..info.Name.." If You Want It Supported Join The Discord Copied To Your Clipboard")
-        setclipboard("https://discord.gg/vqKfva9e")
-    end
-end
-
+-- Executor kontrolü
 if getthreadcontext() > 7 then
     print("Executor Supported")
 else
-    local_player:Kick(identifyexecutor().." Is Not Supported You Are Not Banned This Is Just A Kick Message Because Your Executor Is Not Supported")
+    local_player:Kick(identifyexecutor().." Is Not Supported. This is just a kick message because your executor is not supported.")
 end
 
-if game.GameId == 7546582051 and not game.PlaceId == 94845773826960 then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games/dungeonheroes.lua",true))()
+-- Özel game ID kontrolü (manuel override gibi)
+if game.GameId == 7546582051 and game.PlaceId == 94845773826960 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games/DungeonHeroes.lua", true))()
     library:Notify("Supported Game Loading: "..info.Name)
     return
 end
 
-check_supported()
+-- Genel destek kontrolü
+local function check_supported()
+    local success, result = pcall(function()
+        return game:HttpGet(games.."/"..game.PlaceId..".lua")
+    end)
+    if not success or result == "404: Not Found" then
+        library:Notify("Unsupported Game: "..info.Name.." — If you want it supported, join the Discord. Link copied.")
+        setclipboard("https://discord.gg/vqKfva9e")
+        return false
+    end
+    return true
+end
 
-loadstring(game:HttpGet(games.."/"..game.PlaceId..".lua"))()
-library:Notify("Supported Game Loading: "..info.Name)
+-- Destekli ise yükle
+if check_supported() then
+    loadstring(game:HttpGet(games.."/"..game.PlaceId..".lua", true))()
+    library:Notify("Supported Game Loading: "..info.Name)
+end
