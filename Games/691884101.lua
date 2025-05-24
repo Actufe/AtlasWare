@@ -218,6 +218,30 @@ local watermark_connection = run_service.RenderStepped:Connect(function()
     ));
 end);
 
+MenuGroup:AddButton('Unload', function()
+    WatermarkConnection:Disconnect()
+    Library:Unload()
+end)
+
+CreditsGroup:AddLabel('@zelvednpervet: Who made the script', true)
+
+CreditsGroup:AddButton({
+    Text = 'Join our discord!',
+    Func = function()
+        setclipboard('https://discord.gg/vqKfva9e')
+    end,
+    DoubleClick = false,
+    Tooltip = 'Join our official discord server.'
+})
+
+CreditsGroup:AddButton({
+    Text = 'Scriptblox profile',
+    Func = function()
+        setclipboard('https://scriptblox.com/u/redogurt')
+    end,
+    DoubleClick = false,
+    Tooltip = 'My scriptblox profile'
+})
 
 
 
