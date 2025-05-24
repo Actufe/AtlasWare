@@ -4,10 +4,10 @@ local Library = loadstring(game:HttpGet(repo ..'Gui%20Lib%20%5BLibrary%5D'))()
 local ThemeManager = loadstring(game:HttpGet(repo ..'Gui%20Lib%20%5BThemeManager%5D'))()
 local SaveManager = loadstring(game:HttpGet(repo ..'Gui%20Lib%20%5BSaveManager%5D'))()
 
-Library:Notify('UwU Thanks For Using My Script 🐾🐾🐾 Mreow', 15)
+Library:Notify(' Thanks For Using My Script, 15)
 
 local Window = Library:CreateWindow({
-    Title = 'Astolfo Ware | Made by @kylosilly',
+    Title = 'Atlas Ware | Made by @zelvednpervet',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -512,7 +512,7 @@ local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(
         FrameCounter = 0;
     end;
 
-    Library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: ' .. Info.Name .. ''):format(
+    Library:SetWatermark(('Atlas Ware | %s fps | %s ms | game: ' .. Info.Name .. ''):format(
         math.floor(FPS),
         math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
     ));
@@ -531,34 +531,20 @@ MenuGroup:AddButton('Unload', function()
     Library:Unload()
 end)
 
-CreditsGroup:AddLabel('@kylosilly: Who made the script', true)
+CreditsGroup:AddLabel('@zelvednpervet: Who made the script', true)
 
 CreditsGroup:AddButton({
     Text = 'Join our discord!',
     Func = function()
-        setclipboard('https://discord.gg/frQv5QScXS')
+        setclipboard('https://discord.gg/vqKfva9e')
     end,
     DoubleClick = false,
     Tooltip = 'Join our official discord server.'
 })
 
-CreditsGroup:AddButton({
-    Text = 'Kylosilly Scriptblox',
-    Func = function()
-        setclipboard('https://scriptblox.com/u/CatBoy')
-    end,
-    DoubleClick = false,
-    Tooltip = 'My scriptblox profile'
-})
 
-CreditsGroup:AddButton({
-    Text = 'Kylosilly Github',
-    Func = function()
-        setclipboard('https://github.com/kylosilly')
-    end,
-    DoubleClick = false,
-    Tooltip = 'My github profile'
-})
+
+
 
 MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
 Library.ToggleKeybind = Options.MenuKeybind
