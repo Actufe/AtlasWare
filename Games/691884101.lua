@@ -23,10 +23,23 @@ local tabs = {
     ['ui settings'] = window:AddTab('UI Settings')
 }
 
-local game_group = tabs.main:AddLeftGroupbox('Game Settings')
-local player_group = tabs.main:AddRightGroupbox('Player Settings')
-local teleport_group = tabs.main:AddLeftGroupbox('Teleport Settings')
 local menu_group = tabs['ui settings']:AddLeftGroupbox('Menu')
+
+-- Ayarları başta yükle
+theme_manager:SetLibrary(library)
+save_manager:SetLibrary(library)
+save_manager:IgnoreThemeSettings()
+save_manager:SetIgnoreIndexes({ 'MenuKeybind' })
+theme_manager:SetFolder('Astolfo Ware')
+save_manager:SetFolder('Astolfo Ware/Tradelands')
+save_manager:BuildConfigSection(tabs['ui settings'])
+theme_manager:ApplyToTab(tabs['ui settings'])
+save_manager:LoadAutoloadConfig()
+
+-- Diğer UI öğeleri
+local game_group = tabs.main:AddLeftGroupbox('Game Settings')
+local teleport_group = tabs.main:AddLeftGroupbox('Autofarm')
+local credits_group = tabs.main:AddRightGroupbox('Credits')
 
 local replicated_storage = cloneref(game:GetService("ReplicatedStorage"))
 local tween_service = cloneref(game:GetService("TweenService"))
@@ -199,33 +212,9 @@ game_group:AddButton("Stop Autofarm", function()
     end
 end)
 
-local FrameTimer = tick()
-local FrameCounter = 0;
-local FPS = 60;
+credits_group:AddLabel('@zelvednpervet: Who made the script', true)
 
-local watermark_connection = run_service.RenderStepped:Connect(function()
-    FrameCounter += 1;
-
-    if (tick() - FrameTimer) >= 1 then
-        FPS = FrameCounter;
-        FrameTimer = tick();
-        FrameCounter = 0;
-    end;
-
-    library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
-        math.floor(FPS),
-        math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
-    ));
-end);
-
-MenuGroup:AddButton('Unload', function()
-    WatermarkConnection:Disconnect()
-    Library:Unload()
-end)
-
-CreditsGroup:AddLabel('@zelvednpervet: Who made the script', true)
-
-CreditsGroup:AddButton({
+credits_group:AddButton({
     Text = 'Join our discord!',
     Func = function()
         setclipboard('https://discord.gg/vqKfva9e')
@@ -234,7 +223,7 @@ CreditsGroup:AddButton({
     Tooltip = 'Join our official discord server.'
 })
 
-CreditsGroup:AddButton({
+credits_group:AddButton({
     Text = 'Scriptblox profile',
     Func = function()
         setclipboard('https://scriptblox.com/u/redogurt')
@@ -243,16 +232,38 @@ CreditsGroup:AddButton({
     Tooltip = 'My scriptblox profile'
 })
 
+local menuKeybindOption = menu_group:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
 
+if type(menuKeybindOption.Get) == 'function' then
+    library.ToggleKeybind = menuKeybindOption:Get()
+elseif type(menuKeybindOption.GetValue) == 'function' then
+    library.ToggleKeybind = menuKeybindOption:GetValue()
+elseif menuKeybindOption.Value then
+    library.ToggleKeybind = menuKeybindOption.Value
+else
+    library.ToggleKeybind = 'End'
+end
 
-menu_group:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
-library.ToggleKeybind = Options.MenuKeybind
-theme_manager:SetLibrary(library)
-save_manager:SetLibrary(library)
-save_manager:IgnoreThemeSettings()
-save_manager:SetIgnoreIndexes({ 'MenuKeybind' })
-theme_manager:SetFolder('Astolfo Ware')
-save_manager:SetFolder('Astolfo Ware/Tradelands')
-save_manager:BuildConfigSection(tabs['ui settings'])
-theme_manager:ApplyToTab(tabs['ui settings'])
-save_manager:LoadAutoloadConfig()
+local FrameTimer = tick()
+local FrameCounter = 0
+local FPS = 60
+
+local watermark_connection = run_service.RenderStepped:Connect(function()
+    FrameCounter += 1
+
+    if (tick() - FrameTimer) >= 1 then
+        FPS = FrameCounter
+        FrameTimer = tick()
+        FrameCounter = 0
+    end
+
+    library:SetWatermark(('Atlas Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
+        math.floor(FPS),
+        math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
+    ))
+end)
+
+menu_group:AddButton('Unload', function()
+    watermark_connection:Disconnect()
+    library:Unload()
+end)
