@@ -455,7 +455,7 @@ credits_group:AddLabel('@Zelvednpervet: Who made the script', true)
 credits_group:AddButton({
     Text = 'Join our discord!',
     Func = function()
-        setclipboard('https://discord.gg/DbgEA5ny6t')
+        setclipboard('https://discord.gg/vqKfva9e')
     end,
     DoubleClick = false,
     Tooltip = 'Join our official discord server.'
@@ -470,14 +470,7 @@ credits_group:AddButton({
     Tooltip = 'My scriptblox profile'
 })
 
-credits_group:AddButton({
-    Text = 'Kylosilly Github',
-    Func = function()
-        setclipboard('https://github.com/Actufe')
-    end,
-    DoubleClick = false,
-    Tooltip = 'My github profile'
-})
+
 
 menu_group:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
 library.ToggleKeybind = Options.MenuKeybind
