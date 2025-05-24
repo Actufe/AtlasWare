@@ -11,7 +11,7 @@ if not game:IsLoaded() then
 end
 
 local window = library:CreateWindow({
-    Title = 'Astolfo Ware | https://discord.gg/SUTpER4dNc | Made by @kylosilly',
+    Title = 'Atlas Ware | discord.gg/vqKfva9e | Made by @zelvednpervet',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -1382,7 +1382,7 @@ local watermark_connection = run_service.RenderStepped:Connect(function()
         FrameCounter = 0;
     end;
 
-    library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
+    library:SetWatermark(('Atlas Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
         math.floor(FPS),
         math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
     ));
@@ -1438,34 +1438,20 @@ menu_group:AddButton('Unload', function()
     library:Unload()
 end)
 
-credits_group:AddLabel('@kylosilly: Who made the script', true)
+credits_group:AddLabel('@zelvednpervet: Who made the script', true)
 
 credits_group:AddButton({
     Text = 'Join our discord!',
     Func = function()
-        setclipboard('https://discord.gg/SUTpER4dNc')
+        setclipboard('https://discord.gg/vqKfva9e')
     end,
     DoubleClick = false,
     Tooltip = 'Join our official discord server.'
 })
 
-credits_group:AddButton({
-    Text = 'Kylosilly Scriptblox',
-    Func = function()
-        setclipboard('https://scriptblox.com/u/CatBoy')
-    end,
-    DoubleClick = false,
-    Tooltip = 'My scriptblox profile'
-})
 
-credits_group:AddButton({
-    Text = 'Kylosilly Github',
-    Func = function()
-        setclipboard('https://github.com/kylosilly')
-    end,
-    DoubleClick = false,
-    Tooltip = 'My github profile'
-})
+
+
 
 settings_group:AddToggle('keybind_visibility', {
     Text = 'Keybind Visibility',
