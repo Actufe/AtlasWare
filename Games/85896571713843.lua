@@ -16,7 +16,7 @@ if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Intro") then
 end
 
 local window = library:CreateWindow({
-    Title = 'Astolfo Ware | Public | Made By @kylosilly',
+    Title = 'Atlas ware | Public | Made By @zelvednpervet',
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -1315,7 +1315,7 @@ local watermark_connection = run_service.RenderStepped:Connect(function()
         FrameCounter = 0;
     end;
 
-    library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
+    library:SetWatermark(('Atlas Ware | %s fps | %s ms | game: ' .. info.Name .. ''):format(
         math.floor(FPS),
         math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
     ));
