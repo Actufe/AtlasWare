@@ -15,7 +15,7 @@ end
 
 -- Özel game ID kontrolü (manuel override gibi)
 if game.GameId == 7546582051 and game.PlaceId == 94845773826960 then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Actufe/AtlasWare/main/Games/DungeonHeroes.lua", true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Actufe/AtlasWare/refs/heads/main/Games/Games/dungeon%20heroes.lua", true))()
     library:Notify("Supported Game Loading: "..info.Name)
     return
 end
