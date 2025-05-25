@@ -58,6 +58,14 @@ user_input_service.JumpRequest:Connect(function()
     end
 end)
 
+local did = false
+local_player.OnTeleport:Connect(function()
+    if queue_teleport and not did then
+        did = true
+        queue_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/kylosilly/Astolfo-Ware-V2/refs/heads/main/Loader.lua'))()")
+    end
+end)
+
 local speed_connection = run_service.Heartbeat:Connect(function()
     if tp_walk and local_player.Character and local_player.Character:FindFirstChild("Humanoid") and local_player.Character:FindFirstChild("HumanoidRootPart") then
         if local_player.Character.Humanoid.MoveDirection.Magnitude > 0 then
