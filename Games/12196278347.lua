@@ -1,4 +1,4 @@
---// Made by @kylosilly on discord ;-b last updated version: Beta v.13
+
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
