@@ -1,3 +1,4 @@
+--// If anyone is skidding or reading this mb for the ass optimizations </3
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
@@ -9,7 +10,7 @@ local theme_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BThemeManag
 local save_manager = loadstring(game:HttpGet(repo .. 'Gui%20Lib%20%5BSaveManager%5D'))()
 
 local window = library:CreateWindow({
-    Title = "Atlas Ware | Turkiye numero one | https://discord.gg/wBzAMprV",
+    Title = "Atlas Ware | Made By @Zelvedn",
     Center = true,
     AutoShow = true,
     TabPadding = 8,
@@ -28,6 +29,7 @@ local menu_group = tabs["ui settings"]:AddLeftGroupbox("Menu Settings")
 
 local marketplace_service = game:GetService("MarketplaceService")
 local replicated_storage = game:GetService("ReplicatedStorage")
+local virtual_user = game:GetService("VirtualUser")
 local run_service = game:GetService("RunService")
 local workspace = game:GetService("Workspace")
 local players = game:GetService("Players")
@@ -39,7 +41,7 @@ local local_player = players.LocalPlayer
 
 local tycoon = nil
 
-for _, v in next, workspace:WaitForChild("Tycoons"):GetDescendants() do
+for _, v in next, workspace:FindFirstChild("Tycoons"):GetDescendants() do
     if v.Name == "Player" and v.Value == local_player then
         tycoon = v.Parent
     end
@@ -49,32 +51,32 @@ if not tycoon then
     local_player:Kick("Player restaurant not found!")
 end
 
-local client_customers = tycoon:WaitForChild("ClientCustomers")
+local client_customers = tycoon:FindFirstChild("ClientCustomers")
 
 if not client_customers then
     local_player:Kick("Client Customers folder not found!")
 end
 
-local items = tycoon:WaitForChild("Items")
+local items = tycoon:FindFirstChild("Items")
 
 if not items then
     local_player:Kick("Items folder not found!")
 end
 
-local food = tycoon:WaitForChild("Objects"):WaitForChild("Food")
+local food = tycoon:FindFirstChild("Objects"):FindFirstChild("Food")
 
 if not food then
     local_player:Kick("Food folder not found!")
 end
 
-local furniture = items:WaitForChild("Furniture")
-local surface = items:WaitForChild("Surface")
+local furniture = items:FindFirstChild("Furniture")
+local surface = items:FindFirstChild("Surface")
 
 if not (furniture and surface) then
     local_player:Kick("???")
 end
 
-local temp = workspace:WaitForChild("Temp")
+local temp = workspace:FindFirstChild("Temp")
 
 if not temp then
     local_player:Kick("Temp folder not found!")
@@ -88,7 +90,7 @@ local auto_order = false
 local auto_bills = false
 local fast_cook = false
 local auto_sit = false
-local anti_afk = false
+local auto_jar = false
 
 auto_group:AddDivider()
 
@@ -112,6 +114,48 @@ auto_group:AddToggle('auto_dirty_dish', {
                 end
                 task.wait(.5)
             until not auto_dirty_dish
+        end
+    end
+})
+
+auto_group:AddToggle('auto_sit', {
+    Text = 'Auto Seat Customers',
+    Default = auto_sit,
+    Tooltip = 'Automatically gives customers a seat',
+
+    Callback = function(Value)
+        auto_sit = Value
+        if Value then
+            repeat
+                for _, v in next, client_customers:GetChildren() do
+                    for _, v2 in next, surface:GetChildren() do
+                        if v2.Name:find("T") and not v2:GetAttribute("InUse") and v:IsA("Folder") then
+                            replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("TaskCompleted"):FireServer({ GroupId = tostring(v.Name), Tycoon = tycoon, Name = "SendToTable", Furniture = v2 })
+                        end
+                    end
+                end
+                task.wait(.5)
+            until not auto_sit
+        end
+    end
+})
+
+auto_group:AddToggle('auto_jar', {
+    Text = 'Auto Collect Tip Jar',
+    Default = auto_jar,
+    Tooltip = 'Collects tip jars',
+
+    Callback = function(Value)
+        auto_jar = Value
+        if Value then
+            repeat
+                for _, v in next, furniture:GetDescendants() do
+                    if v.Name:find("Jar") and v.Parent:GetAttribute("Value") > 0 then
+                        replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("TipsCollected"):FireServer(tycoon)
+                    end
+                end
+                task.wait(.5)
+            until not auto_jar
         end
     end
 })
@@ -156,6 +200,7 @@ auto_group:AddToggle('auto_order', {
     end
 })
 
+-- you can also just fire proximityprompt in temp but i decided to take the long way ahdhasdhashdahsda
 auto_group:AddToggle('auto_put_orders', {
     Text = 'Auto Put Orders',
     Default = auto_put_orders,
@@ -166,13 +211,10 @@ auto_group:AddToggle('auto_put_orders', {
         if Value then
             repeat
                 for _, v in next, surface:GetDescendants() do
-                    if v.Name:find("Order Counter") and v.Parent.Parent:GetAttribute("InUse") then
+                    if v.Name:find("Order") and v.Parent.Parent:GetAttribute("InUse") then
                         for _, v2 in next, temp:GetDescendants() do
                             if v2:IsA("ProximityPrompt") then
-                                local order = v2
-                                if order then
-                                    replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("Interactions"):WaitForChild("Interacted"):FireServer(tycoon, { WorldPosition = v.Parent.Parent:GetPivot().Position, Model = v.Parent.Parent, ActionText = "Cook", InteractionType = "OrderCounter", Part = v.Parent, Prompt = v, TemporaryPart = v.Parent, Id = v.Name })
-                                end
+                                replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("Interactions"):WaitForChild("Interacted"):FireServer(tycoon, { WorldPosition = v.Parent.Parent:GetPivot().Position, Model = v.Parent.Parent, ActionText = "Cook", InteractionType = "OrderCounter", Part = v.Parent, Prompt = v, TemporaryPart = v.Parent, Id = v.Name })
                             end
                         end
                     end
@@ -195,40 +237,17 @@ auto_group:AddToggle('auto_give_food', {
                 if #food:GetChildren() > 0 then
                     for _, v in next, food:GetChildren() do
                         for _, v2 in next, client_customers:GetDescendants() do
-                            if v:IsA("Model") and not v:GetAttribute("Taken") then
-                                replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("GrabFood"):InvokeServer(v)
-                                task.wait()
-                            end
-                            if v2:IsA("Model") then
+                            if v2:IsA("Model") and v:GetAttribute("Taken") then
                                 replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("TaskCompleted"):FireServer({ Name = "Serve", GroupId = tostring(v2.Parent.Name), Tycoon = tycoon, FoodModel = v, CustomerId = tostring(v2.Name) })
                             end
+                        end
+                        if not v:GetAttribute("Taken") then
+                            replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("GrabFood"):InvokeServer(v)
                         end
                     end
                 end
                 task.wait(.5)
             until not auto_give_food
-        end
-    end
-})
-
-auto_group:AddToggle('auto_sit', {
-    Text = 'Auto Seat Customers',
-    Default = auto_sit,
-    Tooltip = 'Automatically gives customers a seat',
-
-    Callback = function(Value)
-        auto_sit = Value
-        if Value then
-            repeat
-                for _, v in next, client_customers:GetChildren() do
-                    for _, v2 in next, surface:GetChildren() do
-                        if v2.Name:find("T") and not v2:GetAttribute("InUse") and v:IsA("Folder") then
-                            replicated_storage:WaitForChild("Events"):WaitForChild("Restaurant"):WaitForChild("TaskCompleted"):FireServer({ GroupId = tostring(v.Name), Tycoon = tycoon, Name = "SendToTable", Furniture = v2 })
-                        end
-                    end
-                end
-                task.wait(.5)
-            until not auto_sit
         end
     end
 })
@@ -255,23 +274,41 @@ auto_group:AddToggle('instant_food', {
 
 player_group:AddDivider()
 
-player_group:AddToggle('anti_afk', {
+player_group:AddButton({
     Text = 'Anti Afk',
-    Default = anti_afk,
-    Tooltip = 'Wont disconnect you after 20 minutes',
-
-    Callback = function(Value)
-        anti_afk = Value
-        if Value then
+    Func = function()
+        if get_gc then
             for _, v in next, get_gc(local_player.Idled) do
-                if anti_afk and v["Disable"] then
+                if v["Disable"] then
                     v["Disable"](v)
-                elseif anti_afk and v["Disconnect"] then
+                elseif v["Disconnect"] then
                     v["Disconnect"](v)
                 end
             end
+        else
+            local_player.Idled:Connect(function()
+                virtual_user:CaptureController()
+                virtual_user:ClickButton2(Vector2.new())
+            end)
         end
-    end
+        library:Notify("Anti Afk Enabled!")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Wont disconnect you after 20 minutes'
+})
+
+player_group:AddButton({
+    Text = 'Claim Daily Reward',
+    Func = function()
+        if not tycoon:FindFirstChild("Default"):FindFirstChild("DailyRewards") then
+            library:Notify("Already Claimed")
+            return
+        end
+        replicated_storage:WaitForChild("Events"):WaitForChild("DailyRewards"):WaitForChild("DailyRewardClaimed"):FireServer()
+        library:Notify("Claimed Daily Reward")
+    end,
+    DoubleClick = false,
+    Tooltip = 'Claims daily reward gift'
 })
 
 misc_group:AddDivider()
@@ -284,9 +321,10 @@ misc_group:AddButton({
                 v.Parent:Destroy()
             end
         end
+        library:Notify("Waypoints Destroyed")
     end,
     DoubleClick = false,
-    Tooltip = 'Destroys annyoing waypoints'
+    Tooltip = 'Destroys annoying waypoints'
 })
 
 local frame_timer = tick()
@@ -302,7 +340,7 @@ local watermark_connection = run_service.RenderStepped:Connect(function()
         frame_counter = 0;
     end;
 
-    library:SetWatermark(('Astolfo Ware | %s fps | %s ms | game: '..info.Name..''):format(
+    library:SetWatermark(('Atlas Ware | %s fps | %s ms | game: '..info.Name..''):format(
         math.floor(fps),
         math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
     ));
@@ -317,7 +355,7 @@ menu_group:AddButton('Unload', function()
     auto_bills = false
     fast_cook = false
     auto_sit = false
-    anti_afk = false
+    auto_jar = false
     watermark_connection:Disconnect()
     library:Unload()
 end)
