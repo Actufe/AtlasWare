@@ -10,7 +10,7 @@ local info = market:GetProductInfo(game.PlaceId)
 if getthreadcontext() > 7 then
     print("Executor Supported")
 else
-    local_player:Kick(identifyexecutor().." Is Not Supported. This is just a kick message because your executor is not supported.")
+    local_player:Kick(identifyexecutor().."You are getting banned and exposed..")
 end
 
 -- Özel game ID kontrolü (manuel override gibi)
